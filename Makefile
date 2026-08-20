@@ -1,11 +1,30 @@
 ## Day 20 - Model Serving & Inference Optimization
-## One model (Gemma 4 E2B), one runtime (prebuilt llama.cpp). No compiler, no Docker.
+## One model (Qwen3.5 0.8B by default), one runtime (prebuilt llama.cpp). No compiler, no Docker.
 
+SHELL    := bash
 VENV     := .venv
-PY       := $(VENV)/bin/python
-PIP      := $(VENV)/bin/pip
-LOCUST   := $(VENV)/bin/locust
-SYSPY    := python3
+
+# GNU Make launched from Git Bash still runs on Windows, where venv executables
+# live in Scripts/ (not bin/). uname reports MINGW/MSYS/CYGWIN in that case.
+UNAME_S  := $(shell uname -s 2>/dev/null || echo unknown)
+ifneq (,$(filter MINGW% MSYS% CYGWIN%,$(UNAME_S)))
+WINDOWS  := 1
+VENV_BIN := $(VENV)/Scripts
+PY       := $(VENV_BIN)/python.exe
+SYSPY    ?= python
+else
+WINDOWS  := 0
+VENV_BIN := $(VENV)/bin
+PY       := $(VENV_BIN)/python
+SYSPY    ?= python3
+endif
+
+PIP      := $(PY) -m pip
+LOCUST   := $(PY) -m locust
+# This Windows laptop uses the lightweight model by default. Override with
+# LAB_MODEL=gemma4-e2b if you want to switch back later.
+LAB_MODEL ?= qwen35-0.8b
+export LAB_MODEL
 # Override if 8080 is taken (Colab runs its own service there): LAB_SERVER_PORT=8090
 PORT     := $(or $(LAB_SERVER_PORT),8080)
 
@@ -22,8 +41,6 @@ BUILD_JOBS := $(or $(LLAMA_BUILD_JOBS),$(shell \
                  [ $$j -gt $(CORES) ] && j=$(CORES); \
                  [ $$j -lt 1 ] && j=1; echo $$j))
 
-OS := $(shell uname -s 2>/dev/null || echo Windows)
-
 .DEFAULT_GOAL := help
 
 help: ## Show this help
@@ -31,7 +48,7 @@ help: ## Show this help
 	      printf "\nDay 20 lab - Model Serving & Inference Optimization\n\nUsage:  make \033[36m<target>\033[0m\n"} \
 	      /^## ---/ { printf "\n%s\n", substr($$0, 8); next } \
 	      /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@printf "\nWindows:  pwsh -ExecutionPolicy Bypass -File labs/00-setup/bootstrap.ps1\n"
+	@printf "\nWindows Git Bash:  make setup\n"
 	@printf "4-8 GB RAM?  LAB_MODEL=qwen35-0.8b make setup  (runs locally).\n"
 	@printf "Under 4 GB RAM?  Use cloud/Day20-lab.ipynb on Colab or Kaggle.\n\n"
 
@@ -47,16 +64,15 @@ venv-check:
 probe: ## Probe hardware -> hardware.json (stdlib only, no install needed)
 	@$(SYSPY) labs/00-setup/detect-hardware.py
 
-setup: ## Install deps + fetch llama.cpp runtime + download Gemma 4 E2B (~5.6 GB)
-ifeq ($(OS),Windows)
-	@echo "On Windows run: pwsh -ExecutionPolicy Bypass -File labs/00-setup/bootstrap.ps1"
-	@exit 1
-else
+setup: ## Install deps + fetch llama.cpp runtime + download the selected model
 	@test -d $(VENV) || $(SYSPY) -m venv $(VENV)
+ifeq ($(WINDOWS),1)
+	@$(PIP) install wheel >/dev/null
+else
 	@$(PY) -m pip install --upgrade pip wheel >/dev/null
+endif
 	@$(PIP) install -r requirements.txt
 	@$(PY) labs/00-setup/setup.py
-endif
 
 runtime: venv-check ## Re-fetch just the prebuilt llama.cpp binaries
 	@$(PY) labs/00-setup/fetch-runtime.py --force

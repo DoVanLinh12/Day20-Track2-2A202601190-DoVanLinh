@@ -1,0 +1,52 @@
+[
+  {
+    "quantization": "Q4_K_M",
+    "prompt": "Return only the number: 17 * 23.",
+    "answer": "17 * 23 = 391"
+  },
+  {
+    "quantization": "Q4_K_M",
+    "prompt": "Return only a JSON object with keys \"name\" and \"score\" from: Linh scored 92 points.",
+    "answer": "{\"name\": \"Linh\", \"score\": 92}"
+  },
+  {
+    "quantization": "Q4_K_M",
+    "prompt": "In one sentence, distinguish goodput from raw throughput in model serving.",
+    "answer": "Goodput measures the actual latency and throughput achieved by a specific model instance, whereas raw throughput refers to the theoretical maximum capacity of the model's architecture and hardware without considering latency or specific model performance."
+  },
+  {
+    "quantization": "Q4_K_M",
+    "prompt": "What memory problem does PagedAttention solve? Answer in one sentence.",
+    "answer": "PagedAttention solves the memory bottleneck of large-scale attention by using a hybrid architecture that combines a fixed-size memory buffer with a variable-size dynamic buffer, allowing it to efficiently manage both the large context window and the small batch size simultaneously."
+  },
+  {
+    "quantization": "Q4_K_M",
+    "prompt": "Trả lời đúng một câu: tại sao tăng số người dùng sau điểm bão hòa làm P95 tăng?",
+    "answer": "Tăng số người dùng sau điểm bão hòa làm P95 tăng là do **P95 (95th percentile) phản ánh mức độ khó khăn hoặc độ khó của vấn đề, trong khi số lượng người dùng tăng lên làm tăng tổng số lượng các vấn đề khó khăn**.\n\nKhi hệ thống đạt điểm bão hòa (độ khó cao nhất), việc thêm người dùng mới sẽ tạo ra các vấn đề mới, làm tăng tổng số các vấn đề khó khăn"
+  },
+  {
+    "quantization": "UD-Q2_K_XL",
+    "prompt": "Return only the number: 17 * 23.",
+    "answer": "17 * 23 = 371"
+  },
+  {
+    "quantization": "UD-Q2_K_XL",
+    "prompt": "Return only a JSON object with keys \"name\" and \"score\" from: Linh scored 92 points.",
+    "answer": "```json\n{\"name\": \"Linh\", \"score\": 92}\n```"
+  },
+  {
+    "quantization": "UD-Q2_K_XL",
+    "prompt": "In one sentence, distinguish goodput from raw throughput in model serving.",
+    "answer": "Goodput is a high-performance caching layer that optimizes data access for real-time inference, while raw throughput refers to the raw data rate measured in gigabytes per second."
+  },
+  {
+    "quantization": "UD-Q2_K_XL",
+    "prompt": "What memory problem does PagedAttention solve? Answer in one sentence.",
+    "answer": "PagedAttention solves the memory problem of the \"memory leak\" by using a shared memory pool that allows for efficient, non-blocking memory allocation, which is essential for high-performance training in large-scale models."
+  },
+  {
+    "quantization": "UD-Q2_K_XL",
+    "prompt": "Trả lời đúng một câu: tại sao tăng số người dùng sau điểm bão hòa làm P95 tăng?",
+    "answer": "**Đúng một câu trả lời:**\n\nTại sao tăng số người dùng sau điểm bão hòa làm P95 tăng?\n\n**Đúng một câu trả lời:**\n\nTại sao tăng số người dùng sau điểm bão hòa làm P95 tăng?\n\n**Đúng một câu trả lời:**\n\nTại sao tăng số người dùng sau điểm bão hòa làm P95 tăng?\n\n**Đúng một câu trả lời:**\n\nTại sao tăng số người dùng sau điểm bão"
+  }
+]
