@@ -106,8 +106,9 @@ cho thấy queue rõ ràng.
 
 ## 6. Bonus *(optional — tối đa 20 điểm)*
 
-**Đã làm:** B2 GPU-offload sweep; B3 before/after từ sweep; B4 challenge C5
-“smallest useful quantization”; B5/C9 embedding-serving offline regime.
+**Đã làm:** B1 tự build và so sánh; B2 GPU-offload sweep; B3 before/after từ
+sweep; B4 challenge C5 “smallest useful quantization”; B5/C9 embedding-serving
+trên endpoint local thật.
 
 ```text
 before:  34.1 tok/s (-ngl 0, CPU-only)
@@ -120,11 +121,19 @@ Partial offload không tạo đường cong tăng đều: `-ngl 8` và `16` ch�
 giới host–Vulkan. Khi 32 layer đã chuyển sang accelerator, chi phí đó được amortize;
 `-ngl 99` không nhanh thêm vì không còn layer hữu ích để chuyển.
 
+B1 dùng đúng revision `b10488`, cùng Q4, 6 thread và ép cả hai binary về `-ngl 0`.
+Bản MinGW/GCC `-DGGML_NATIVE=ON` đạt 15.6 tok/s, trong khi prebuilt đạt 33.9 tok/s.
+Ryzen 5 7430U có AVX2/FMA; dòng “none” trong report chỉ do hardware probe Windows
+không ghi extension. Kết quả 0.46× cho thấy native targeting không bảo đảm thắng
+toolchain và CPU kernel/runtime dispatch của release đã được tối ưu tốt hơn.
+
 C5 cho kết quả Q4 2/5 và Q2 0/5 trên năm prompt strict. Q2 sai phép nhân, bịa goodput
-là caching layer và vi phạm JSON-only, nên tiết kiệm 0.11 GB không đáng. C9 cho thấy
-embedding là prefill-only: không decode loop/KV cache, nên static batching quan trọng
-hơn continuous batching. Bản offline xác nhận control flow nhưng không đại diện chất
-lượng/throughput của encoder thật; production cần Qwen3-Embedding hoặc BGE-M3.
+là caching layer và vi phạm JSON-only, nên tiết kiệm 0.11 GB không đáng. C9 chạy
+`llama-server /v1/embeddings` local thật: batch 1 đạt 0.3 texts/s và batch 16 đạt
+4.0 texts/s, trong khi latency chỉ tăng từ 3.03 lên 3.96 giây. Điều này xác nhận
+embedding là prefill-only và static batching quan trọng hơn continuous batching.
+Demo tái dùng chat GGUF để không tải thêm; production vẫn cần đánh giá bằng encoder
+chuyên dụng như Qwen3-Embedding hoặc BGE-M3.
 
 ---
 
@@ -144,5 +153,6 @@ này cho thấy raw concurrency có thể chủ yếu tạo queue chứ không t
 - [x] integration report
 - [x] 5 screenshots
 - [x] `make verify` exit 0 sau khi stage artifact
-- [ ] Push lên GitHub public và paste URL vào LMS
+- [x] Repo GitHub public: `https://github.com/DoVanLinh12/Day20-Track2-2A202601190-DoVanLinh`
+- [ ] Paste URL repo vào LMS
 - [x] Không commit GGUF hoặc `runtime/`

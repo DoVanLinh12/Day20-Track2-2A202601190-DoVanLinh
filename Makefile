@@ -41,6 +41,14 @@ BUILD_JOBS := $(or $(LLAMA_BUILD_JOBS),$(shell \
                  [ $$j -gt $(CORES) ] && j=$(CORES); \
                  [ $$j -lt 1 ] && j=1; echo $$j))
 
+# CMake on native Windows otherwise looks for Visual Studio even when the user
+# installed MinGW for Git Bash. Select MinGW automatically when it is available.
+ifeq ($(WINDOWS),1)
+CMAKE_GENERATOR_ARG := $(if $(shell command -v mingw32-make 2>/dev/null),-G "MinGW Makefiles",)
+else
+CMAKE_GENERATOR_ARG :=
+endif
+
 .DEFAULT_GOAL := help
 
 help: ## Show this help
@@ -145,8 +153,8 @@ build-llama: venv-check ## B1 - build llama.cpp from source and beat the prebuil
 	      https://github.com/ggml-org/llama.cpp; \
 	  fi; \
 	  cd llama.cpp; \
-	  cmake -B build $(LLAMA_CMAKE_FLAGS) -DGGML_NATIVE=ON -DCMAKE_BUILD_TYPE=Release; \
-	  cmake --build build -j $(BUILD_JOBS) --config Release'
+	  cmake -B build $(CMAKE_GENERATOR_ARG) $(LLAMA_CMAKE_FLAGS) -DGGML_NATIVE=ON -DCMAKE_BUILD_TYPE=Release; \
+	  cmake --build build --target llama-bench -j $(BUILD_JOBS) --config Release'
 	@echo ""
 	@echo "Built. Now compare it against the prebuilt binary you have been using:"
 	@echo "  $(PY) bonus/compare-builds.py"
