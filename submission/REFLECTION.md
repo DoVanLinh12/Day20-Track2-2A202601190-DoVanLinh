@@ -1,7 +1,7 @@
 # Reflection — Day 20 Lab (Personal Report)
 
 **Họ Tên:** Đỗ Văn Linh  
-**Cohort:** AICB-P2T2  
+**Cohort:** A20-K2  
 **Ngày submit:** 2026-08-20
 
 ---
